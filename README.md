@@ -16,7 +16,7 @@ We publish the forecast through a [web application](https://one-quiet-night.gith
 Install:
 ```
 git clone https://github.com/One-Quiet-Night/COVID-19-forecast
-cd onequietnight
+cd COVID-19-forecast
 python setup.py install
 ```
 
