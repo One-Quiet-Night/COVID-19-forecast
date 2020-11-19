@@ -50,6 +50,9 @@ class OneQuietNightEnvironment:
         target end date of the forecast.
     """
 
+    # Environment settings
+    # Default settings are meant to be portable.
+    # They should be modified in different environments.
     locations_filename = "locations.feather"
     features_filename = "feature_store.joblib"
     models_filename = "model_store.joblib"
