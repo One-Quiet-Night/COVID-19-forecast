@@ -158,13 +158,14 @@ def get_cbsa():
         "geographies/reference-files/2020/delineation-files/list1_2020.xls"
     )
     url_req = requests.get(url).content
-    cbsa = pd.read_excel(url_req, skiprows=2, skipfooter=4)
+    cbsa = pd.read_excel(url_req, skiprows=2, skipfooter=4, dtype={'CBSA Code': str})
     cbsa["FIPS"] = cbsa["FIPS State Code"].astype(str).apply(
         lambda s: s.zfill(2)
     ) + cbsa["FIPS County Code"].astype(str).apply(lambda s: s.zfill(3))
     cbsa["FIPS"] = cbsa["FIPS"].replace({"11001": "11"})
     cbsa = cbsa.rename(
         columns={
+            "CBSA Code": "CBSACode",
             "CBSA Title": "CBSA",
             "CSA Title": "CSA",
             "FIPS": "fips.id",
@@ -190,7 +191,7 @@ def get_locations():
     cbsa = get_cbsa()
     df = pd.merge(
         locations_df,
-        cbsa[["CBSA", "CBSAType", "CSA", "fips.id"]],
+        cbsa[["CBSACode", "CBSA", "CBSAType", "CSA", "fips.id"]],
         on="fips.id",
         how="left",
     )
@@ -205,6 +206,7 @@ def get_locations():
         "latestLaborForce",
         "hospitalLicensedBeds",
         "hospitalStaffedBeds",
+        "CBSACode",
         "CBSA",
         "CBSAType",
         "CSA",
