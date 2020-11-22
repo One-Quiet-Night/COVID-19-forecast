@@ -5,7 +5,7 @@ import joblib
 import pandas as pd
 
 from onequietnight.config import max_weeks_ahead, model_configs
-from onequietnight.data import apple, covidtracking, google, jhu
+from onequietnight.data import apple, covidtracking, google, jhu, covidcast
 from onequietnight.data.io import get_date_partition, read_data, write_data
 from onequietnight.data.locations import convert_c3ai_to_jhu, get_locations
 from onequietnight.data.utils import to_dataframe, to_matrix
@@ -87,7 +87,7 @@ class OneQuietNightEnvironment:
 
     def get_data(self):
         if self.write:
-            for source in [jhu, apple, google, covidtracking]:
+            for source in [jhu, apple, google, covidtracking, covidcast]:
                 try:
                     for name in source.metrics:
                         self.data[name] = read_data(self, name)
@@ -96,7 +96,7 @@ class OneQuietNightEnvironment:
                     write_data(self, source_data)
                     self.data = {**self.data, **source_data}
         else:
-            for source in [jhu, apple, google, covidtracking]:
+            for source in [jhu, apple, google, covidtracking, covidcast]:
                 source_data = source.load_data(self)
                 self.data = {**self.data, **source_data}
 
@@ -192,10 +192,14 @@ class OneQuietNightEnvironment:
         forecasts_df["value"] = forecasts_df["value"].clip(0)
 
         if instance_offset == 0:
-            filename = f"{self.today}-OneQuietNight.csv"
+            filename = f"{self.today}-OneQuietNight-ML.csv"
         else:
-            filename = f"Backfill-{instance_offset}-{self.today}-OneQuietNight.csv"
+            filename = f"Backfill-{instance_offset}-{self.today}-OneQuietNight-ML.csv"
         filepath = Path(get_date_partition(self), filename)
+        logger.info(f"Writing to {filepath}")
+        forecasts_df.to_csv(filepath, index=False)
+
+        filepath = Path(self.base_path, "data-processed", "OneQuietNight-ML", filename)
         logger.info(f"Writing to {filepath}")
         forecasts_df.to_csv(filepath, index=False)
 
@@ -219,6 +223,12 @@ class OneQuietNightEnvironment:
         for universe_name, universe in universes.items():
             filename = f"JHU_IncidentCases_{universe_name.capitalize()}.csv"
             filepath = Path(get_date_partition(self), filename)
+            logger.info(f"Writing to {filepath}")
+            select_universe(dm, universe).to_csv(filepath)
+
+        for universe_name, universe in universes.items():
+            filename = f"JHU_IncidentCases_{universe_name.capitalize()}.csv"
+            filepath = Path(self.base_path, "vis", "Data", universe_name.capitalize(), filename)
             logger.info(f"Writing to {filepath}")
             select_universe(dm, universe).to_csv(filepath)
 
