@@ -66,3 +66,4 @@ ENV/
 .vscode/
 
 2020-*/
+*.ipynb
