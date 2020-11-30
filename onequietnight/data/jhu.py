@@ -136,4 +136,7 @@ def load_data(env):
     if env.load_data_jhu:
         return load_data_jhu(env)
     else:
-        return {name: c3ai.load_data(env, name, levels=['country', 'state', 'county']) for name in metrics}
+        return {
+            name: c3ai.load_data(env, name, levels=["country", "state", "county"])
+            for name in metrics
+        }

@@ -70,11 +70,11 @@ class TruncatedModel(LinearModel):
     def model(self, X, y=None):
         num_features = X.shape[1]
         beta = numpyro.sample(
-            "beta", dist.Normal(jnp.zeros(num_features), 1 * jnp.ones(num_features))
+            "beta", dist.Normal(jnp.zeros(num_features), 100 * jnp.ones(num_features))
         )
-        alpha = numpyro.sample("alpha", dist.Normal(0, 1))
+        alpha = numpyro.sample("alpha", dist.Normal(0, 100))
         theta = jnp.dot(X, beta) + alpha
-        sigma = numpyro.sample("sigma", dist.HalfNormal(1))
+        sigma = numpyro.sample("sigma", dist.HalfNormal(100))
         return numpyro.sample(
             "obs", dist.TruncatedNormal(low=0, loc=theta.clip(0), scale=sigma), obs=y
         )
@@ -84,11 +84,23 @@ class SoftPlusModel(LinearModel):
     def model(self, X, y=None):
         num_features = X.shape[1]
         beta = numpyro.sample(
-            "beta", dist.Normal(jnp.zeros(num_features), 1 * jnp.ones(num_features))
+            "beta", dist.Normal(jnp.zeros(num_features), 100 * jnp.ones(num_features))
         )
-        alpha = numpyro.sample("alpha", dist.Normal(0, 1))
+        alpha = numpyro.sample("alpha", dist.Normal(0, 100))
         theta = jnp.dot(X, beta) + alpha
-        sigma = numpyro.sample("sigma", dist.HalfNormal(1))
+        sigma = numpyro.sample("sigma", dist.HalfNormal(100))
         return numpyro.sample(
             "obs", dist.Normal(jnp.log(1 + jnp.exp(theta)), sigma), obs=y
         )
+
+
+class RobustModel(LinearModel):
+    def model(self, X, y=None):
+        num_features = X.shape[1]
+        beta = numpyro.sample(
+            "beta", dist.Normal(jnp.zeros(num_features), 100 * jnp.ones(num_features))
+        )
+        alpha = numpyro.sample("alpha", dist.Normal(0, 100))
+        theta = jnp.dot(X, beta) + alpha
+        sigma = numpyro.sample("sigma", dist.HalfNormal(100))
+        return numpyro.sample("obs", dist.StudentT(2, theta, sigma), obs=y)

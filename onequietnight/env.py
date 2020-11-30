@@ -9,9 +9,13 @@ from onequietnight.data import apple, covidtracking, google, jhu, covidcast
 from onequietnight.data.io import get_date_partition, read_data, write_data
 from onequietnight.data.locations import convert_c3ai_to_jhu, get_locations
 from onequietnight.data.utils import to_dataframe, to_matrix
-from onequietnight.features import (county, national, state,
-                                    transform_data_to_features,
-                                    transform_dates)
+from onequietnight.features import (
+    county,
+    national,
+    state,
+    transform_data_to_features,
+    transform_dates,
+)
 from onequietnight.features.transforms import normalize_cases, select_universe
 from onequietnight.models.forecast import ForecastPipeline
 
@@ -85,24 +89,30 @@ class OneQuietNightEnvironment:
         else:
             return get_locations()
 
-    def get_data(self):
+    def get_data(self, force=False):
         if self.write:
-            for source in [jhu, apple, google, covidtracking, covidcast]:
-                try:
-                    for name in source.metrics:
-                        self.data[name] = read_data(self, name)
-                except ValueError:
+            if force:
+                for source in [jhu, apple, google, covidtracking, covidcast]:
                     source_data = source.load_data(self)
                     write_data(self, source_data)
                     self.data = {**self.data, **source_data}
+            else:
+                for source in [jhu, apple, google, covidtracking, covidcast]:
+                    try:
+                        for name in source.metrics:
+                            self.data[name] = read_data(self, name)
+                    except ValueError:
+                        source_data = source.load_data(self)
+                        write_data(self, source_data)
+                        self.data = {**self.data, **source_data}
         else:
             for source in [jhu, apple, google, covidtracking, covidcast]:
                 source_data = source.load_data(self)
                 self.data = {**self.data, **source_data}
 
-    def get_features(self):
+    def get_features(self, force=False):
         features_df_path = Path(get_date_partition(self), self.features_filename)
-        if self.write and features_df_path.exists():
+        if self.write and features_df_path.exists() and not force:
             logger.info(f"Reading features from {str(features_df_path)}.")
             self.features = joblib.load(str(features_df_path))
         else:
@@ -228,7 +238,9 @@ class OneQuietNightEnvironment:
 
         for universe_name, universe in universes.items():
             filename = f"JHU_IncidentCases_{universe_name.capitalize()}.csv"
-            filepath = Path(self.base_path, "vis", "Data", universe_name.capitalize(), filename)
+            filepath = Path(
+                self.base_path, "vis", "Data", universe_name.capitalize(), filename
+            )
             logger.info(f"Writing to {filepath}")
             select_universe(dm, universe).to_csv(filepath)
 

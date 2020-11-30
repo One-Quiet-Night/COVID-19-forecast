@@ -1,11 +1,14 @@
 import logging
 
 import pandas as pd
-from onequietnight.features.transforms import (cross_section_mean,
-                                               cross_section_winsor,
-                                               get_national_value,
-                                               normalize_beds, normalize_cases,
-                                               select_universe)
+from onequietnight.features.transforms import (
+    cross_section_mean,
+    cross_section_winsor,
+    get_national_value,
+    normalize_beds,
+    normalize_cases,
+    select_universe,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +186,134 @@ def transform_features(env, features, freq="W-SAT"):
     out["Google_WorkplacesMobility.rolling(7).mean().shift(14)"] = (
         features["Google_WorkplacesMobility"].rolling(7).mean().shift(14).reindex(dates)
     )
+
+    out["Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(7)"] = (
+        features["Chng_SmoothedOutpatientCovid"]
+        .rolling(7)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(14)"] = (
+        features["Chng_SmoothedOutpatientCovid"]
+        .rolling(7)
+        .mean()
+        .shift(14)
+        .reindex(dates)
+    )
+
+    out["DoctorVisits_SmoothedCli.rolling(7).mean().shift(7)"] = (
+        features["DoctorVisits_SmoothedCli"].rolling(7).mean().shift(7).reindex(dates)
+    )
+    out["DoctorVisits_SmoothedCli.rolling(7).mean().shift(14)"] = (
+        features["DoctorVisits_SmoothedCli"].rolling(7).mean().shift(14).reindex(dates)
+    )
+
+    out["FbSurvey_RawWili.rolling(7).mean()"] = (
+        features["FbSurvey_RawWili"].rolling(7, min_periods=1).mean().reindex(dates)
+    )
+    out["FbSurvey_RawWili.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawWili"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["FbSurvey_RawWcli.rolling(7).mean()"] = (
+        features["FbSurvey_RawWcli"].rolling(7, min_periods=1).mean().reindex(dates)
+    )
+    out["FbSurvey_RawWcli.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawWcli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["FbSurvey_RawHhCmntyCli.rolling(7).mean()"] = (
+        features["FbSurvey_RawHhCmntyCli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .reindex(dates)
+    )
+    out["FbSurvey_RawHhCmntyCli.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawHhCmntyCli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+
+    out["Ght_RawSearch.rolling(7).mean().shift(4)"] = (
+        features["Ght_RawSearch"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Ght_RawSearch.rolling(7).mean().shift(11)"] = (
+        features["Ght_RawSearch"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+
+    out["Safegraph_CompletelyHomeProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_CompletelyHomeProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_CompletelyHomeProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_CompletelyHomeProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_FullTimeWorkProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_FullTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_FullTimeWorkProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_FullTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_PartTimeWorkProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_PartTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_PartTimeWorkProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_PartTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_MedianHomeDwellTime"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_MedianHomeDwellTime"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
     return out
 
 
@@ -256,11 +387,33 @@ def clean_features(env, input_features):
         "Google_ResidentialMobility.rolling(7).mean().shift(14)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(7)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(14)",
+        "Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(7)",
+        "Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(14)",
+        "DoctorVisits_SmoothedCli.rolling(7).mean().shift(7)",
+        "DoctorVisits_SmoothedCli.rolling(7).mean().shift(14)",
+        "FbSurvey_RawWili.rolling(7).mean()",
+        "FbSurvey_RawWili.rolling(7).mean().shift(7)",
+        "FbSurvey_RawWcli.rolling(7).mean()",
+        "FbSurvey_RawWcli.rolling(7).mean().shift(7)",
+        "FbSurvey_RawHhCmntyCli.rolling(7).mean()",
+        "FbSurvey_RawHhCmntyCli.rolling(7).mean().shift(7)",
+        "Ght_RawSearch.rolling(7).mean().shift(4)",
+        "Ght_RawSearch.rolling(7).mean().shift(11)",
+        "Safegraph_CompletelyHomeProp.rolling(7).mean().shift(4)",
+        "Safegraph_CompletelyHomeProp.rolling(7).mean().shift(11)",
+        "Safegraph_FullTimeWorkProp.rolling(7).mean().shift(4)",
+        "Safegraph_FullTimeWorkProp.rolling(7).mean().shift(11)",
+        "Safegraph_PartTimeWorkProp.rolling(7).mean().shift(4)",
+        "Safegraph_PartTimeWorkProp.rolling(7).mean().shift(11)",
+        "Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(4)",
+        "Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(11)",
     ]
 
     for name in impute_group_2:
         logger.info(f"Processing {name}.")
-        dm_national = select_universe(input_features[name], universe_national)
+        dm_national = select_universe(
+            input_features[name], universe_national, fill_missing=True
+        )
         dm = select_universe(input_features[name], universe_states, fill_missing=True)
         dm = dm.fillna(method="ffill")
         dm = dm.fillna(get_national_value(dm, dm_national))

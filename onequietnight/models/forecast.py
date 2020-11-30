@@ -4,9 +4,11 @@ import numpy as np
 import pandas as pd
 from onequietnight.data.utils import to_dataframe, to_matrix
 from onequietnight.features import model_names
-from onequietnight.features.transforms import (normalize_cases,
-                                               undo_normalize_cases,
-                                               undo_normalize_cases_df)
+from onequietnight.features.transforms import (
+    normalize_cases,
+    undo_normalize_cases,
+    undo_normalize_cases_df,
+)
 
 logger = logging.getLogger(__name__)
 

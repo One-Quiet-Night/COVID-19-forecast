@@ -160,4 +160,7 @@ def load_data(env):
     if env.load_data_apple:
         return load_data_apple(env)
     else:
-        return {name: c3ai.load_data(env, name, levels=['country', 'state', 'county']) for name in metrics}
+        return {
+            name: c3ai.load_data(env, name, levels=["country", "state", "county"])
+            for name in metrics
+        }

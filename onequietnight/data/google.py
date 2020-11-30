@@ -117,4 +117,7 @@ def load_data(env):
     if env.load_data_google:
         return load_data_google(env)
     else:
-        return {name: c3ai.load_data(env, name, levels=['country', 'state', 'county']) for name in metrics}
+        return {
+            name: c3ai.load_data(env, name, levels=["country", "state", "county"])
+            for name in metrics
+        }
