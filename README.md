@@ -45,7 +45,8 @@ joins three pieces of data together:
     - The tabular location data about the country, states, and counties from the C3 AI Covid-19 Data Lake `OutbreakLocation` `fetch` API.
     - The [Covid-19 Forecast Hub](https://github.com/reichlab/covid19-forecast-hub) location data (for publication).
     - The [Census Metropolitan and Micropolitan Statstical Area Reference File](https://www.census.gov/geographies/reference-files/time-series/demo/metro-micro/delineation-files.html) to resolve county CBSA membership.
-- `get_data`: Download source data. The following data are downloaded from the C3 AI Covid-19 Data Lake `OutbreakLocation` `evalmetrics` API.
+- `get_data`: Download source data.
+- The following data are downloaded from the C3 AI Covid-19 Data Lake `OutbreakLocation` `evalmetrics` API.
     - Apple_DrivingMobility
     - Apple_TransitMobility
     - Apple_WalkingMobility
@@ -63,8 +64,11 @@ joins three pieces of data together:
     - JHU_ConfirmedCases
     - JHU_ConfirmedDeaths
     - These data are sourced from [Apple](https://covid19.apple.com/mobility), [Covid Tracking Project](https://covidtracking.com/), [Google](https://www.google.com/covid19/mobility/), and [JHU](https://github.com/CSSEGISandData/COVID-19).
-    - We also implement fall backs that download from these sources and process them to the C3 AI Covid-19 Data Lake schema and format. The fall backs can be used when there are latency issues or missing releases with one of the sources.
-    - These controls are exposed as class variables in `OneQuietNightEnvironment`.
+    - We also implement fall backs that download from these sources and process them to the C3 AI Covid-19 Data Lake schema and format. The fall backs can be used when there are latency issues or missing releases with one of the sources. These controls are exposed as class variables in `OneQuietNightEnvironment`.
+- The following data are sourced from [covidcast](https://cmu-delphi.github.io/delphi-epidata/api/covidcast.html).
+    - Safegraph_FullTimeWorkProp
+    - Safegraph_CompletelyHomeProp
+    - Ght_RawSearch
 - `get_features`: Transform source data to input features for modeling. It currently produces three sets of features for the three models that we have at each geographic hierarchical level.
 - `train_models`: Trains the machine learning algorithms using the features. We implement a model pipeline to expose the data to the models and to handle the fit and predict processes. The pipeline class can be extended to implement additional models for use with the C3 AI Covid-19 Data Lake data sets.
 - `save_visualization_data`: Make predictions using the latest features. Generate csv files for OneQuietNight web application.
