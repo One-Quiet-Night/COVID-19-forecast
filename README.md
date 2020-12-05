@@ -3,7 +3,7 @@
 | Forecast           | National, state, and county numbers of new COVID-19 cases per week for next 4 weeks. |
 :------------------- |:---------------------------------------------------- |
 | **Authors**        | Areum Jo (areumjo1@gmail.com), Jae Cho (jaehun.cho@gmail.com) |
-| **Last Updated**   | 2020-11-18                                           |
+| **Last Updated**   | 2020-12-05                                           |
 | **Paper**          | [OneQuietNight Covid-19 Forecast](docs/OQN.pdf) |
 
 OneQuietNight Covid-19 Forecast uses scientifically-driven machine learning models to accurately predict the spread of Covid-19 infections using real-time data from the [C3 AI Covid-19 Data Lake](https://c3.ai/customers/covid-19-data-lake/). OneQuietNight forecasts the number of new Covid-19 cases per week for the next 4 weeks at the national, state, and county levels.
