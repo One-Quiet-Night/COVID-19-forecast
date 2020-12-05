@@ -177,7 +177,7 @@ class OneQuietNightEnvironment:
 
     def save_covidhub_data(self, instance_offset=0):
         forecasts = self.predict(
-            should_predict_proba=False,
+            should_predict_proba=True,
             should_undo_normalize_cases=True,
             instance_offset=instance_offset,
         )
@@ -223,6 +223,18 @@ class OneQuietNightEnvironment:
             df = df.set_index(["dates", "location"])["value"].unstack()
             filename = f"OQN_IncidentCasesForecast_{name.capitalize()}.csv"
             filepath = Path(get_date_partition(self), filename)
+            logger.info(f"Writing to {filepath}")
+            df.to_csv(filepath)
+        for name, df in forecasts.items():
+            if name == "national":
+                name = "country"
+            df = convert_c3ai_to_jhu(df, self.locations_df)
+            df = df.rename(columns={"target_end_date": "dates"})
+            df = df.set_index(["dates", "location"])["value"].unstack()
+            filename = f"OQN_IncidentCasesForecast_{name.capitalize()}.csv"
+            filepath = Path(
+                self.base_path, "vis", "Data", name.capitalize(), filename
+            )
             logger.info(f"Writing to {filepath}")
             df.to_csv(filepath)
 

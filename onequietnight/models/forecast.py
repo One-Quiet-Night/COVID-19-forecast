@@ -94,8 +94,14 @@ class ForecastPipeline:
         ]
         logger.info(f"Training on window [{train_dates[0]}, {train_dates[-1]}]")
         train = self.df.loc[train_dates]
+        train = train.replace([-np.inf, np.inf], np.nan)
+        train_missing_any_cols = train.isnull().any(1)
+        if train_missing_any_cols.any():
+            logger.info(f"Dropping missing values: {train_missing_any_cols[train_missing_any_cols].index}")
+            train = train.dropna()
         y_train = train["target"].values
         X_train = train[feature_columns].values
+        logger.info(f"X: {X_train.shape}, y: {y_train.shape}")
         self.model = self.get_model()
         self.model.fit(X_train, y_train)
 

@@ -39,5 +39,11 @@ setup(
         "requests==2.23.0",
         "beautifulsoup4==4.9.3",
         "sklearn-pandas==2.0.3",
+        "covidcast",
+        "pytz",
+        "python-dateutil",
+        "xlrd",
+        "pyarrow",
+        "tabulate"
     ],
 )

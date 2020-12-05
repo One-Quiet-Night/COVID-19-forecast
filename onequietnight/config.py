@@ -8,6 +8,7 @@ national = dict(
         "Apple_DrivingMobility.rolling(7).mean().shift(7)",
         "Apple_TransitMobility.rolling(7).mean()",
         "Apple_TransitMobility.rolling(7).mean().shift(7)",
+        "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
     ],
@@ -23,6 +24,7 @@ state = dict(
         "Apple_DrivingMobility.rolling(7).mean().shift(7)",
         "Apple_TransitMobility.rolling(7).mean()",
         "Apple_TransitMobility.rolling(7).mean().shift(7)",
+        "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(14)",
@@ -46,6 +48,7 @@ county = dict(
         "Apple_DrivingMobility.rolling(7).mean().shift(7)",
         "Apple_TransitMobility.rolling(7).mean()",
         "Apple_TransitMobility.rolling(7).mean().shift(7)",
+        "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(7)",
@@ -62,4 +65,4 @@ county = dict(
 )
 
 model_configs = {"national": national, "state": state, "county": county}
-max_weeks_ahead = 8
+max_weeks_ahead = 4

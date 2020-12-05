@@ -23,6 +23,9 @@ def transform_features(env, features, freq="W-SAT"):
     dates = pd.date_range(env.start_date, env.today, freq=freq, name="dates")
 
     out = {}
+    out["JHU_ConfirmedCases"] = (
+        features["JHU_ConfirmedCases"].reindex(dates)
+    )
     out["JHU_ConfirmedCases.diff(7)"] = (
         features["JHU_ConfirmedCases"].diff(7).reindex(dates)
     )
@@ -347,6 +350,7 @@ def clean_features(env, input_features):
         output_features[name] = dm
 
     impute_group_1 = [
+        "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
         "JHU_ConfirmedDeaths.diff(7)",

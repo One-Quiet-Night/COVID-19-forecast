@@ -60,10 +60,10 @@ class ClippedModel(LinearModel):
         beta = numpyro.sample(
             "beta", dist.Normal(jnp.zeros(num_features), 100 * jnp.ones(num_features))
         )
-        alpha = numpyro.sample("alpha", dist.Normal(0, 100))
+        alpha = numpyro.sample("alpha", dist.Normal(0, 100.))
         theta = jnp.dot(X, beta) + alpha
-        sigma = numpyro.sample("sigma", dist.HalfNormal(100))
-        return numpyro.sample("obs", dist.Normal(theta.clip(0), sigma), obs=y)
+        sigma = numpyro.sample("sigma", dist.HalfNormal(100.))
+        return numpyro.sample("obs", dist.Normal(theta, sigma), obs=y)
 
 
 class TruncatedModel(LinearModel):
