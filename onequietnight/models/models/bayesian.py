@@ -42,13 +42,14 @@ class LinearModel(BaseEstimator, RegressorMixin):
         predictions = self.predictive(random.PRNGKey(0), X)["obs"]
         predictions = np.array(predictions)
         predictions[~np.isfinite(predictions)] = np.nan
-        probs = [0.98, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+        # probs = [0.98, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+        probs = [0.95, 0.8, 0.5]
         results = {}
         for prob in probs:
-            a, b, = (
-                1 - prob
-            ) / 2, (1 + prob) / 2
+            a, b, = (1 - prob) / 2, (1 + prob) / 2
             results[a], results[b] = hpdi(predictions, prob)
+        # a, b = hpdi(predictions, 0.02)
+        # results[0.5] = (a + b) / 2
         results[0.5] = np.nanpercentile(predictions, 50, axis=0)
         results = pd.DataFrame(results)
         return results

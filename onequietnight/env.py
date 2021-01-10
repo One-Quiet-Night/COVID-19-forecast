@@ -78,7 +78,7 @@ class OneQuietNightEnvironment:
 
     def get_or_create_locations_df(self):
         if self.write:
-            locations_df_path = Path(get_date_partition(self), self.locations_filename)
+            locations_df_path = Path(self.base_path, self.locations_filename) # Path(get_date_partition(self), self.locations_filename)
             if Path.exists(locations_df_path):
                 return pd.read_feather(locations_df_path)
             else:
@@ -200,6 +200,7 @@ class OneQuietNightEnvironment:
         )
         forecasts_df["value"] = forecasts_df["value"].round()
         forecasts_df["value"] = forecasts_df["value"].clip(0)
+        forecasts_df["quantile"] = forecasts_df["quantile"].round(3)
 
         if instance_offset == 0:
             filename = f"{self.today}-OneQuietNight-ML.csv"
@@ -225,16 +226,11 @@ class OneQuietNightEnvironment:
             filepath = Path(get_date_partition(self), filename)
             logger.info(f"Writing to {filepath}")
             df.to_csv(filepath)
-        for name, df in forecasts.items():
-            if name == "national":
-                name = "country"
-            df = convert_c3ai_to_jhu(df, self.locations_df)
-            df = df.rename(columns={"target_end_date": "dates"})
-            df = df.set_index(["dates", "location"])["value"].unstack()
-            filename = f"OQN_IncidentCasesForecast_{name.capitalize()}.csv"
+
             filepath = Path(
-                self.base_path, "vis", "Data", name.capitalize(), filename
+                self.base_path, "vis", "src", "Data", name.capitalize(), filename
             )
+            Path.mkdir(filepath.parent, parents=True, exist_ok=True)
             logger.info(f"Writing to {filepath}")
             df.to_csv(filepath)
 
@@ -248,10 +244,8 @@ class OneQuietNightEnvironment:
             logger.info(f"Writing to {filepath}")
             select_universe(dm, universe).to_csv(filepath)
 
-        for universe_name, universe in universes.items():
-            filename = f"JHU_IncidentCases_{universe_name.capitalize()}.csv"
             filepath = Path(
-                self.base_path, "vis", "Data", universe_name.capitalize(), filename
+                self.base_path, "vis", "src", "Data", universe_name.capitalize(), filename
             )
             logger.info(f"Writing to {filepath}")
             select_universe(dm, universe).to_csv(filepath)

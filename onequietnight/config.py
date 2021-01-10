@@ -1,13 +1,8 @@
 national = dict(
     universe="national",
-    train_window=16,
+    train_window=24,
     feature_columns=[
-        "Apple_WalkingMobility.rolling(7).mean()",
-        "Apple_WalkingMobility.rolling(7).mean().shift(7)",
         "Apple_DrivingMobility.rolling(7).mean()",
-        "Apple_DrivingMobility.rolling(7).mean().shift(7)",
-        "Apple_TransitMobility.rolling(7).mean()",
-        "Apple_TransitMobility.rolling(7).mean().shift(7)",
         "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
@@ -16,7 +11,7 @@ national = dict(
 
 state = dict(
     universe="state",
-    train_window=20,
+    train_window=24,
     feature_columns=[
         "Apple_WalkingMobility.rolling(7).mean()",
         "Apple_WalkingMobility.rolling(7).mean().shift(7)",

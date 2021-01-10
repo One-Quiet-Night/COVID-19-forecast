@@ -66,4 +66,9 @@ ENV/
 .vscode/
 
 2020-*/
+2021-*/
 *.ipynb
+vis/
+*.csv
+*.feather
+*.sh
