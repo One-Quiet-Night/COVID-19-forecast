@@ -100,25 +100,22 @@ def cross_section_mean(dm):
 def cross_section_cbsa_mean(dm, locations_df):
     """Compute mean within CBSA.
 
-    Group counties without membership as a group using groupby( dropna=False).
+    Group counties without membership as a group using groupby(dropna=False).
     """
     df = to_dataframe(dm)
     df = df.reset_index("dates").join(locations_df.set_index("id")["CBSA"])
     df = df.set_index("dates", append=True)
-    df = df.groupby(["dates", "CBSA"], dropna=False)["value"].transform(np.nanmean)
+    df = df.groupby(["dates", "CBSA"], dropna=True)["value"].transform(np.nanmean)
     return to_matrix(df)
 
 
 def cross_section_state_mean(dm):
-    """Compute mean within state level.
-
-    Group counties without membership as a group using groupby(dropna=False).
-    """
+    """Compute mean within state level."""
     df = to_dataframe(dm)
     df = df.reset_index("id")
     df["state"] = df["id"].apply(lambda s: s.split("_")[1])
     df = df.set_index("id", append=True)
-    df = df.groupby(["dates", "state"], dropna=False)["value"].transform(np.mean)
+    df = df.groupby(["dates", "state"])["value"].transform(np.mean)
     return to_matrix(df)
 
 

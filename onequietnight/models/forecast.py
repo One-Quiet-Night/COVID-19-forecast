@@ -4,9 +4,11 @@ import numpy as np
 import pandas as pd
 from onequietnight.data.utils import to_dataframe, to_matrix
 from onequietnight.features import model_names
-from onequietnight.features.transforms import (normalize_cases,
-                                               undo_normalize_cases,
-                                               undo_normalize_cases_df)
+from onequietnight.features.transforms import (
+    normalize_cases,
+    undo_normalize_cases,
+    undo_normalize_cases_df,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -92,8 +94,14 @@ class ForecastPipeline:
         ]
         logger.info(f"Training on window [{train_dates[0]}, {train_dates[-1]}]")
         train = self.df.loc[train_dates]
+        train = train.replace([-np.inf, np.inf], np.nan)
+        train_missing_any_cols = train.isnull().any(1)
+        if train_missing_any_cols.any():
+            logger.info(f"Dropping missing values: {train_missing_any_cols[train_missing_any_cols].index}")
+            train = train.dropna()
         y_train = train["target"].values
         X_train = train[feature_columns].values
+        logger.info(f"X: {X_train.shape}, y: {y_train.shape}")
         self.model = self.get_model()
         self.model.fit(X_train, y_train)
 

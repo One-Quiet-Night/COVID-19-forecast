@@ -9,9 +9,7 @@ def assert_long_df(df):
     indexed by a multiindex containing `dates` and `id` and contains a single
     column with {metric_name} such as "Male_Under1_CovidDeaths".
     """
-    has_panel_index = df.index.names == pd.core.indexes.frozen.FrozenList(
-        ["dates", "id"]
-    )
+    has_panel_index = df.index.names == pd.core.indexes.frozen.FrozenList(["dates", "id"])
     assert (
         isinstance(df, pd.Series) and has_panel_index
     ), "df should be a metric indexed by 'dates' and 'id'."
@@ -23,7 +21,11 @@ def denormalize_data(df):
     This function denormalizes a long form data series to a wide form df.
     """
     assert_long_df(df)
-    df = df.unstack("id")
+    try:
+        df = df.unstack("id")
+    except ValueError:
+        df = df[~df.index.duplicated(keep="last")]
+        df = df.unstack("id")
     return df
 
 

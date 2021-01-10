@@ -5,13 +5,17 @@ import joblib
 import pandas as pd
 
 from onequietnight.config import max_weeks_ahead, model_configs
-from onequietnight.data import apple, covidtracking, google, jhu
+from onequietnight.data import apple, covidtracking, google, jhu, covidcast
 from onequietnight.data.io import get_date_partition, read_data, write_data
 from onequietnight.data.locations import convert_c3ai_to_jhu, get_locations
 from onequietnight.data.utils import to_dataframe, to_matrix
-from onequietnight.features import (county, national, state,
-                                    transform_data_to_features,
-                                    transform_dates)
+from onequietnight.features import (
+    county,
+    national,
+    state,
+    transform_data_to_features,
+    transform_dates,
+)
 from onequietnight.features.transforms import normalize_cases, select_universe
 from onequietnight.models.forecast import ForecastPipeline
 
@@ -74,7 +78,7 @@ class OneQuietNightEnvironment:
 
     def get_or_create_locations_df(self):
         if self.write:
-            locations_df_path = Path(get_date_partition(self), self.locations_filename)
+            locations_df_path = Path(self.base_path, self.locations_filename) # Path(get_date_partition(self), self.locations_filename)
             if Path.exists(locations_df_path):
                 return pd.read_feather(locations_df_path)
             else:
@@ -85,24 +89,30 @@ class OneQuietNightEnvironment:
         else:
             return get_locations()
 
-    def get_data(self):
+    def get_data(self, force=False):
         if self.write:
-            for source in [jhu, apple, google, covidtracking]:
-                try:
-                    for name in source.metrics:
-                        self.data[name] = read_data(self, name)
-                except ValueError:
+            if force:
+                for source in [jhu, apple, google, covidtracking, covidcast]:
                     source_data = source.load_data(self)
                     write_data(self, source_data)
                     self.data = {**self.data, **source_data}
+            else:
+                for source in [jhu, apple, google, covidtracking, covidcast]:
+                    try:
+                        for name in source.metrics:
+                            self.data[name] = read_data(self, name)
+                    except ValueError:
+                        source_data = source.load_data(self)
+                        write_data(self, source_data)
+                        self.data = {**self.data, **source_data}
         else:
-            for source in [jhu, apple, google, covidtracking]:
+            for source in [jhu, apple, google, covidtracking, covidcast]:
                 source_data = source.load_data(self)
                 self.data = {**self.data, **source_data}
 
-    def get_features(self):
+    def get_features(self, force=False):
         features_df_path = Path(get_date_partition(self), self.features_filename)
-        if self.write and features_df_path.exists():
+        if self.write and features_df_path.exists() and not force:
             logger.info(f"Reading features from {str(features_df_path)}.")
             self.features = joblib.load(str(features_df_path))
         else:
@@ -167,7 +177,7 @@ class OneQuietNightEnvironment:
 
     def save_covidhub_data(self, instance_offset=0):
         forecasts = self.predict(
-            should_predict_proba=False,
+            should_predict_proba=True,
             should_undo_normalize_cases=True,
             instance_offset=instance_offset,
         )
@@ -190,12 +200,17 @@ class OneQuietNightEnvironment:
         )
         forecasts_df["value"] = forecasts_df["value"].round()
         forecasts_df["value"] = forecasts_df["value"].clip(0)
+        forecasts_df["quantile"] = forecasts_df["quantile"].round(3)
 
         if instance_offset == 0:
-            filename = f"{self.today}-OneQuietNight.csv"
+            filename = f"{self.today}-OneQuietNight-ML.csv"
         else:
-            filename = f"Backfill-{instance_offset}-{self.today}-OneQuietNight.csv"
+            filename = f"Backfill-{instance_offset}-{self.today}-OneQuietNight-ML.csv"
         filepath = Path(get_date_partition(self), filename)
+        logger.info(f"Writing to {filepath}")
+        forecasts_df.to_csv(filepath, index=False)
+
+        filepath = Path(self.base_path, "data-processed", "OneQuietNight-ML", filename)
         logger.info(f"Writing to {filepath}")
         forecasts_df.to_csv(filepath, index=False)
 
@@ -212,6 +227,13 @@ class OneQuietNightEnvironment:
             logger.info(f"Writing to {filepath}")
             df.to_csv(filepath)
 
+            filepath = Path(
+                self.base_path, "vis", "src", "Data", name.capitalize(), filename
+            )
+            Path.mkdir(filepath.parent, parents=True, exist_ok=True)
+            logger.info(f"Writing to {filepath}")
+            df.to_csv(filepath)
+
         dm = self.get_new_cases_per_100k()
         universes = (
             self.locations_df.groupby("locationType")["fips.id"].apply(list).to_dict()
@@ -219,6 +241,12 @@ class OneQuietNightEnvironment:
         for universe_name, universe in universes.items():
             filename = f"JHU_IncidentCases_{universe_name.capitalize()}.csv"
             filepath = Path(get_date_partition(self), filename)
+            logger.info(f"Writing to {filepath}")
+            select_universe(dm, universe).to_csv(filepath)
+
+            filepath = Path(
+                self.base_path, "vis", "src", "Data", universe_name.capitalize(), filename
+            )
             logger.info(f"Writing to {filepath}")
             select_universe(dm, universe).to_csv(filepath)
 

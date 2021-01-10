@@ -271,7 +271,9 @@ def getprojectionhistory(body, remove_meta=True):
     return df
 
 
-def load_data(env, metric, interval="DAY", start_date=None, levels=['country', 'state']):
+def load_data(
+    env, metric, interval="DAY", start_date=None, levels=["country", "state"]
+):
     logger.info(f"Loading {metric} from C3 AI OutbreakLocation EvalMetrics.")
     df = evalmetrics(
         "outbreaklocation",

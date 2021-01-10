@@ -1,13 +1,16 @@
 import logging
 
 import pandas as pd
-from onequietnight.features.transforms import (cross_section_cbsa_mean,
-                                               cross_section_mean,
-                                               cross_section_state_mean,
-                                               cross_section_winsor,
-                                               get_state_value,
-                                               normalize_cases,
-                                               select_universe)
+from onequietnight.features.transforms import (
+    cross_section_cbsa_mean,
+    cross_section_mean,
+    cross_section_state_mean,
+    cross_section_winsor,
+    get_state_value,
+    normalize_beds,
+    normalize_cases,
+    select_universe,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +27,9 @@ def transform_features(env, features, freq="W-SAT"):
     dates = pd.date_range(env.start_date, env.today, freq=freq, name="dates")
 
     out = {}
+    out["JHU_ConfirmedCases"] = (
+        features["JHU_ConfirmedCases"].reindex(dates)
+    )
     out["JHU_ConfirmedCases.diff(7)"] = (
         features["JHU_ConfirmedCases"].diff(7).reindex(dates)
     )
@@ -36,6 +42,70 @@ def transform_features(env, features, freq="W-SAT"):
     )
     out["JHU_ConfirmedDeaths.diff(7).shift(7)"] = (
         features["JHU_ConfirmedDeaths"].diff(7).shift(7).reindex(dates)
+    )
+
+    out["CovidTrackingProject_ConfirmedCases.diff(7)"] = (
+        features["CovidTrackingProject_ConfirmedCases"].diff(7).reindex(dates)
+    )
+    out["CovidTrackingProject_ConfirmedCases.diff(7).shift(7)"] = (
+        features["CovidTrackingProject_ConfirmedCases"].diff(7).shift(7).reindex(dates)
+    )
+
+    out["CovidTrackingProject_ConfirmedDeaths.diff(7)"] = (
+        features["CovidTrackingProject_ConfirmedDeaths"].diff(7).reindex(dates)
+    )
+    out["CovidTrackingProject_ConfirmedDeaths.diff(7).shift(7)"] = (
+        features["CovidTrackingProject_ConfirmedDeaths"].diff(7).shift(7).reindex(dates)
+    )
+
+    out["CovidTrackingProject_NegativeTests.diff(7)"] = (
+        features["CovidTrackingProject_NegativeTests"].diff(7).reindex(dates)
+    )
+    out["CovidTrackingProject_NegativeTests.diff(7).shift(7)"] = (
+        features["CovidTrackingProject_NegativeTests"].diff(7).shift(7).reindex(dates)
+    )
+
+    out["CovidTrackingProject_PendingTests.rolling(7).mean()"] = (
+        features["CovidTrackingProject_PendingTests"].rolling(7).mean().reindex(dates)
+    )
+    out["CovidTrackingProject_PendingTests.rolling(7).mean().shift(7)"] = (
+        features["CovidTrackingProject_PendingTests"]
+        .rolling(7)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+
+    out["CovidTrackingProject_ConfirmedHospitalizations.rolling(7).mean()"] = (
+        features["CovidTrackingProject_ConfirmedHospitalizations"]
+        .rolling(7)
+        .mean()
+        .reindex(dates)
+    )
+    out["CovidTrackingProject_ConfirmedHospitalizations.rolling(7).mean().shift(7)"] = (
+        features["CovidTrackingProject_ConfirmedHospitalizations"]
+        .rolling(7)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+
+    out["CovidTrackingProject_Ventilator.rolling(7).mean()"] = (
+        features["CovidTrackingProject_Ventilator"].rolling(7).mean().reindex(dates)
+    )
+    out["CovidTrackingProject_Ventilator.rolling(7).mean().shift(7)"] = (
+        features["CovidTrackingProject_Ventilator"]
+        .rolling(7)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+
+    out["CovidTrackingProject_ICU.rolling(7).mean()"] = (
+        features["CovidTrackingProject_ICU"].rolling(7).mean().reindex(dates)
+    )
+    out["CovidTrackingProject_ICU.rolling(7).mean().shift(7)"] = (
+        features["CovidTrackingProject_ICU"].rolling(7).mean().shift(7).reindex(dates)
     )
 
     out["Apple_DrivingMobility.rolling(7).mean()"] = (
@@ -121,6 +191,134 @@ def transform_features(env, features, freq="W-SAT"):
     out["Google_WorkplacesMobility.rolling(7).mean().shift(14)"] = (
         features["Google_WorkplacesMobility"].rolling(7).mean().shift(14).reindex(dates)
     )
+
+    out["Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(7)"] = (
+        features["Chng_SmoothedOutpatientCovid"]
+        .rolling(7)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(14)"] = (
+        features["Chng_SmoothedOutpatientCovid"]
+        .rolling(7)
+        .mean()
+        .shift(14)
+        .reindex(dates)
+    )
+
+    out["DoctorVisits_SmoothedCli.rolling(7).mean().shift(7)"] = (
+        features["DoctorVisits_SmoothedCli"].rolling(7).mean().shift(7).reindex(dates)
+    )
+    out["DoctorVisits_SmoothedCli.rolling(7).mean().shift(14)"] = (
+        features["DoctorVisits_SmoothedCli"].rolling(7).mean().shift(14).reindex(dates)
+    )
+
+    out["FbSurvey_RawWili.rolling(7).mean()"] = (
+        features["FbSurvey_RawWili"].rolling(7, min_periods=1).mean().reindex(dates)
+    )
+    out["FbSurvey_RawWili.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawWili"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["FbSurvey_RawWcli.rolling(7).mean()"] = (
+        features["FbSurvey_RawWcli"].rolling(7, min_periods=1).mean().reindex(dates)
+    )
+    out["FbSurvey_RawWcli.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawWcli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+    out["FbSurvey_RawHhCmntyCli.rolling(7).mean()"] = (
+        features["FbSurvey_RawHhCmntyCli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .reindex(dates)
+    )
+    out["FbSurvey_RawHhCmntyCli.rolling(7).mean().shift(7)"] = (
+        features["FbSurvey_RawHhCmntyCli"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(7)
+        .reindex(dates)
+    )
+
+    out["Ght_RawSearch.rolling(7).mean().shift(4)"] = (
+        features["Ght_RawSearch"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Ght_RawSearch.rolling(7).mean().shift(11)"] = (
+        features["Ght_RawSearch"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+
+    out["Safegraph_CompletelyHomeProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_CompletelyHomeProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_CompletelyHomeProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_CompletelyHomeProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_FullTimeWorkProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_FullTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_FullTimeWorkProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_FullTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_PartTimeWorkProp.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_PartTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_PartTimeWorkProp.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_PartTimeWorkProp"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
+    out["Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(4)"] = (
+        features["Safegraph_MedianHomeDwellTime"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(4)
+        .reindex(dates)
+    )
+    out["Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(11)"] = (
+        features["Safegraph_MedianHomeDwellTime"]
+        .rolling(7, min_periods=1)
+        .mean()
+        .shift(11)
+        .reindex(dates)
+    )
     return out
 
 
@@ -130,7 +328,71 @@ def clean_features(env, input_features):
     universe_counties = env.locations["county"]
     output_features = {}
 
+    impute_group_0 = [
+        "CovidTrackingProject_ConfirmedHospitalizations.rolling(7).mean()",
+        "CovidTrackingProject_ConfirmedHospitalizations.rolling(7).mean().shift(7)",
+        "CovidTrackingProject_ICU.rolling(7).mean()",
+        "CovidTrackingProject_ICU.rolling(7).mean().shift(7)",
+        "CovidTrackingProject_Ventilator.rolling(7).mean()",
+        "CovidTrackingProject_Ventilator.rolling(7).mean().shift(7)",
+    ]
+    for name in impute_group_0:
+        logger.info(f"Processing {name}.")
+        dm_state = select_universe(input_features[name], universe_states)
+        dm_state = normalize_beds(dm_state, locations_df)
+        dm = select_universe(input_features[name], universe_counties, fill_missing=True)
+        dm = get_state_value(dm, dm_state)
+        dm = dm.clip(0)
+        dm = cross_section_winsor(dm)
+        dm = dm.fillna(0)
+        output_features[f"{name}.state"] = dm
+
+    impute_group_1a = [
+        "JHU_ConfirmedCases.diff(7)",
+        "JHU_ConfirmedCases.diff(7).shift(7)",
+        "JHU_ConfirmedDeaths.diff(7)",
+        "JHU_ConfirmedDeaths.diff(7).shift(7)",
+        "CovidTrackingProject_ConfirmedCases.diff(7)",
+        "CovidTrackingProject_ConfirmedCases.diff(7).shift(7)",
+        "CovidTrackingProject_ConfirmedDeaths.diff(7)",
+        "CovidTrackingProject_ConfirmedDeaths.diff(7).shift(7)",
+        "CovidTrackingProject_NegativeTests.diff(7)",
+        "CovidTrackingProject_NegativeTests.diff(7).shift(7)",
+        "CovidTrackingProject_PendingTests.rolling(7).mean()",
+        "CovidTrackingProject_PendingTests.rolling(7).mean().shift(7)",
+    ]
+    for name in impute_group_1a:
+        logger.info(f"Processing {name}.")
+        dm_state = select_universe(input_features[name], universe_states)
+        dm_state = normalize_cases(dm_state, locations_df)
+        dm = select_universe(input_features[name], universe_counties, fill_missing=True)
+        dm = get_state_value(dm, dm_state)
+        dm = dm.clip(0)
+        dm = cross_section_winsor(dm)
+        dm = dm.fillna(0)
+        output_features[f"{name}.state"] = dm
+
+    impute_group_1b = [
+        "JHU_ConfirmedCases.diff(7)",
+        "JHU_ConfirmedCases.diff(7).shift(7)",
+        "JHU_ConfirmedDeaths.diff(7)",
+        "JHU_ConfirmedDeaths.diff(7).shift(7)",
+    ]
+    for name in impute_group_1b:
+        logger.info(f"Processing {name}.")
+        dm_state = select_universe(input_features[name], universe_states)
+        dm_state = normalize_cases(dm_state, locations_df)
+        dm = select_universe(input_features[name], universe_counties, fill_missing=True)
+        dm = normalize_cases(dm, locations_df)
+        dm = cross_section_cbsa_mean(dm, env.locations_df)
+        dm = dm.fillna(get_state_value(dm, dm_state))
+        dm = dm.clip(0)
+        dm = cross_section_winsor(dm)
+        dm = dm.fillna(0)
+        output_features[f"{name}.cbsa"] = dm
+
     impute_group_1 = [
+        "JHU_ConfirmedCases",
         "JHU_ConfirmedCases.diff(7)",
         "JHU_ConfirmedCases.diff(7).shift(7)",
         "JHU_ConfirmedDeaths.diff(7)",
@@ -168,6 +430,26 @@ def clean_features(env, input_features):
         "Google_ResidentialMobility.rolling(7).mean().shift(14)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(7)",
         "Google_WorkplacesMobility.rolling(7).mean().shift(14)",
+        "Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(7)",
+        "Chng_SmoothedOutpatientCovid.rolling(7).mean().shift(14)",
+        "DoctorVisits_SmoothedCli.rolling(7).mean().shift(7)",
+        "DoctorVisits_SmoothedCli.rolling(7).mean().shift(14)",
+        "FbSurvey_RawWili.rolling(7).mean()",
+        "FbSurvey_RawWili.rolling(7).mean().shift(7)",
+        "FbSurvey_RawWcli.rolling(7).mean()",
+        "FbSurvey_RawWcli.rolling(7).mean().shift(7)",
+        "FbSurvey_RawHhCmntyCli.rolling(7).mean()",
+        "FbSurvey_RawHhCmntyCli.rolling(7).mean().shift(7)",
+        "Ght_RawSearch.rolling(7).mean().shift(4)",
+        "Ght_RawSearch.rolling(7).mean().shift(11)",
+        "Safegraph_CompletelyHomeProp.rolling(7).mean().shift(4)",
+        "Safegraph_CompletelyHomeProp.rolling(7).mean().shift(11)",
+        "Safegraph_FullTimeWorkProp.rolling(7).mean().shift(4)",
+        "Safegraph_FullTimeWorkProp.rolling(7).mean().shift(11)",
+        "Safegraph_PartTimeWorkProp.rolling(7).mean().shift(4)",
+        "Safegraph_PartTimeWorkProp.rolling(7).mean().shift(11)",
+        "Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(4)",
+        "Safegraph_MedianHomeDwellTime.rolling(7).mean().shift(11)",
     ]
 
     for name in impute_group_2:
